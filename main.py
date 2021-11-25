@@ -41,8 +41,6 @@ def write_source_code(sourcefile, sourcecode: str, command: str, output: str = N
         response = input("[INFO] file '{ouput}' exists. Do you want to override it? (Y/N) ")
         if response.lower() == "n":
             return
-    else:
-        output = tempfilename
 
     print(f"[INFO] writing output to {output}")
     
