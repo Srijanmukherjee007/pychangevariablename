@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 from variable import Variable
 from helper import set_verbosity, verboseprint, get_file_content, write_content_to_file
@@ -14,8 +15,9 @@ def get_arguments():
     parser.add_argument("source", type=str, help="c source file")
     parser.add_argument("-o", "--output", help="output filepath")
     parser.add_argument("-v", "--verbose", help="enable verbosity", action="store_true")
+    parser.add_argument("-t", "--test", help="enable test mode", action="store_true")
 
-    subparsers = parser.add_subparsers(title="subcommand", dest="subcommand", required=True)
+    subparsers = parser.add_subparsers(title="subcommand", dest="subcommand", required=('-t' not in sys.argv and '--test' not in sys.argv))
     append_command = subparsers.add_parser("append", aliases=["ap"])
     append_command.add_argument("append_text")
 
@@ -46,6 +48,9 @@ def write_source_code(sourcefile, sourcecode: str, command: str, output: str = N
     
     write_content_to_file(output, sourcecode)
 
+def test(sourcecode: str):
+    pass
+
 def main():
     arguments = get_arguments()
     
@@ -54,6 +59,10 @@ def main():
     sourcefile = arguments.source
     check_extension(sourcefile)
     sourcecode = get_file_content(sourcefile)
+
+    if arguments.test:
+        test(sourcecode)
+        return
 
     subcommand = arguments.subcommand
 
