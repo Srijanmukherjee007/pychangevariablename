@@ -38,7 +38,7 @@ def write_source_code(sourcefile, sourcecode: str, command: str, output: str = N
     elif os.path.isdir(output):
         output = os.path.join([output, tempfilename])
     elif os.path.exists(output):
-        response = input("[INFO] file '{ouput}' exists. Do you want to override it? (Y/N) ")
+        response = input(f"[INFO] file {output} exists. Do you want to override it? (Y/N) ")
         if response.lower() == "n":
             return
 
