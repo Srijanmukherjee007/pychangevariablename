@@ -1,5 +1,6 @@
+from abc import abstractclassmethod
 import re
-from typing import List
+from typing import List, Tuple
 from dataclasses import dataclass
 from helper import verboseprint
 
@@ -43,14 +44,14 @@ class Variable:
             offset = variable_declaration.end()
         return variables
 
+    @staticmethod
     def append_to_all_variable_name(source: str, append: str) -> str:
         """appends text to all the variable name in the source code"""
 
-        # TODO fix cases when variable is inside a string def, those are not variables 
-
+        string_literals = Variable.get_all_string_literals(source)
         variables = Variable.get_all_variables(source)
         verboseprint(f"[Variable] found {len(variables)} variable declarations")
-        
+
         for variable in variables:
             replace_with = f"{variable.name}{append}"
             offset = 0
@@ -61,8 +62,17 @@ class Variable:
             verboseprint(f"[Variable] replace '{variable.name}' with '{replace_with}'")
 
             while (search := variable_replace_search.search(source, offset)) is not None:
+                offset = search.end()
                 is_variable = True
                 begin, end = search.span()
+
+                for _, s_start, s_end in string_literals:
+                    if s_start < begin < s_end and s_start < end < s_end:
+                        is_variable = False
+                        break        
+
+                if not is_variable:
+                    continue
 
                 variable_name = source[begin:end]
                 
@@ -93,7 +103,23 @@ class Variable:
                 if is_variable:
                     # replace with new variable name
                     source = source[:begin] + replace_with + source[end:]
-                        
-                offset = search.end()
+
+                    # update string literal indexes
+                    for string_literal in string_literals:
+                        if string_literal[1] > begin:
+                            string_literal[1] += len(append)
+                            string_literal[2] += len(append)
+                    
 
         return source
+
+    @staticmethod
+    def get_all_string_literals(sourcecode: str) -> List[List]:
+        string_literal_search = re.compile(r'"[^"\\]*(\\.[^"\\]*)*"')
+        string_literals = []
+        offset = 0
+        while (string_literal_match := string_literal_search.search(sourcecode, offset)) is not None:
+            start, end = string_literal_match.span()
+            string_literals.append([sourcecode[start:end], start, end])
+            offset = string_literal_match.end()
+        return string_literals

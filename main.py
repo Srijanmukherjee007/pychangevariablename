@@ -49,7 +49,18 @@ def write_source_code(sourcefile, sourcecode: str, command: str, output: str = N
     write_content_to_file(output, sourcecode)
 
 def test(sourcecode: str):
-    pass
+    set_verbosity(True)
+    print("[INFO] running test mode")
+    print("[INFO] source code")
+    print(sourcecode)
+    print("[INFO] testing get_all_string_literals()")
+    string_literals = Variable.get_all_string_literals(sourcecode)
+
+    for s, start, end in string_literals:
+        print(f"'{s}': {start}, {end}")
+
+    print("[INFO] testing append_to_all_variable_name()")
+    print(Variable.append_to_all_variable_name(sourcecode, "_770"))
 
 def main():
     arguments = get_arguments()
