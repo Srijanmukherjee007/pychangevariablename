@@ -5,7 +5,7 @@ from helper import verboseprint
 
 TYPEDEFS = ["int", "char", "long"]
 VARIABLE_SEARCH_REGEX = re.compile(
-    fr'(({"|".join([ fr"(?:{vartype})" for vartype in TYPEDEFS])})(?:(?:(?:[A-Za-z\d\s\_\[\]]+)(?:[=\s][A-Za-z\d\s\'\"\_]+)?[,]?)?)+);'
+    fr'(({"|".join([ fr"(?:{vartype})" for vartype in TYPEDEFS])})(?:(?:(?:[A-Za-z\d\s\_\[\]]+)(?:[=\s][A-Za-z-\[\]\d\s\'\"\_+\\*|~]+)?[,]?)?)+);'
 )
 
 @dataclass
@@ -45,6 +45,8 @@ class Variable:
 
     def append_to_all_variable_name(source: str, append: str) -> str:
         """appends text to all the variable name in the source code"""
+
+        # TODO fix cases when variable is inside a string def, those are not variables 
 
         variables = Variable.get_all_variables(source)
         verboseprint(f"[Variable] found {len(variables)} variable declarations")
